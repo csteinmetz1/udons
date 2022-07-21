@@ -138,7 +138,11 @@ def get_timestamp_embeddings(
     # to reconstruct the audio batches
     embeddings = torch.cat(embeddings_list, dim=0)
     embeddings = rearrange(embeddings, 'b p f -> (b p) f')
-    embeddings = embeddings[:-remainder].unflatten(0, (audio_batches, num_frames))
+
+    if remainder != 0:
+        embeddings = embeddings[:-remainder].unflatten(0, (audio_batches, num_frames))
+    else:
+        embeddings = embeddings.unflatten(0, (audio_batches, num_frames))
 
     return embeddings, timestamps
 
@@ -173,3 +177,5 @@ if __name__ == "__main__":
     model = load_model(args.model_path)
     x, _ = get_timestamp_embeddings(torch.rand(21, 4041000), model)
     print(x.shape)
+
+
